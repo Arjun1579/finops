@@ -138,6 +138,14 @@ def create_and_audit_transaction(tx: TransactionCreate, db: Session = Depends(ge
 def get_transactions(db: Session = Depends(get_db)):
     return db.query(database.Transaction).order_by(database.Transaction.id.desc()).limit(10).all()
 
+@app.delete("/api/transactions/{tx_id}")
+def delete_transaction(tx_id: int, db: Session = Depends(get_db)):
+    tx = db.query(database.Transaction).filter(database.Transaction.id == tx_id).first()
+    if tx:
+        db.delete(tx)
+        db.commit()
+        return {"status": "success", "message": "Transaction deleted"}
+    return {"status": "error", "message": "Transaction not found"}
 # ==========================================
 # EXP 3: VENDOR RISK CLASSIFICATION (RANDOM FOREST)
 # ==========================================
